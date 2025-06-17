@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from models.task import TaskStatus
+from ..models.task import TaskStatus
 
 class TaskBase(BaseModel):
   name:str

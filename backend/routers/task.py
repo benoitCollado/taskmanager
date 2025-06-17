@@ -5,11 +5,11 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from typing import Annotated
 
-from database import get_db
-from models.task import Task
-from models.tasklist import TaskList
-from schemas.task import TaskCreate, TaskRead
-from schemas.task_list import TaskListCreate, TaskListRead, TaskListUpdate
+from ..database import get_db
+from ..models.task import Task
+from ..models.tasklist import TaskList
+from ..schemas.task import TaskCreate, TaskRead
+from ..schemas.task_list import TaskListCreate, TaskListRead, TaskListUpdate
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
