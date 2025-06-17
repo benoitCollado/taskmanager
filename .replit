@@ -17,3 +17,14 @@ externalPort = 3000
 [[ports]]
 localPort = 8000
 externalPort = 80
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Start Frontend"
+author = 32492946
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend/taskfront && npm run dev"
