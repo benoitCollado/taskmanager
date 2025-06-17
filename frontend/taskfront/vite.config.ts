@@ -9,5 +9,6 @@ export default defineConfig({
     port: 5173,              // Change si besoin
     strictPort: true,        // Pour forcer le port
     cors: true,              // Active CORS globalement
+    allowedHosts: ['all'],   // Autorise tous les hôtes pour Replit
   }
 })
