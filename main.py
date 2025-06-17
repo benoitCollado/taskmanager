@@ -1,14 +1,13 @@
-from typing import Union
-
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from database import init_db
+from routers import task
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+app = FastAPI(lifespan=lifespan)
 
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+app.include_router(task.router)
