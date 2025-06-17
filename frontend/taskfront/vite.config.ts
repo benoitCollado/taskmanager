@@ -5,10 +5,13 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   server: {
-    host: true,         // Pour être accessible depuis l'extérieur
-    port: 5173,              // Change si besoin
-    strictPort: true,        // Pour forcer le port
-    cors: true,              // Active CORS globalement
-    allowedHosts: ['all'],   // Autorise tous les hôtes pour Replit
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    cors: true,
+    hmr: {
+      clientPort: 443
+    },
+    disableHostCheck: true
   }
 })
