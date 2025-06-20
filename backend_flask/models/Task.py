@@ -17,8 +17,8 @@ class Task(Base):
   
   id:Mapped[int] = mapped_column(index=True, primary_key=True)
   name:Mapped[str] = mapped_column(nullable=False)
-  status:Mapped[TaskStatus] = mapped_column(Enum(TaskList),default=TaskStatus.pending)
+  status:Mapped[TaskStatus] = mapped_column(Enum(TaskStatus),default=TaskStatus.pending)
   list_id:Mapped[int] = mapped_column(ForeignKey("task_list.id"))
 
-  list: Mapped[TaskList] = relationship(back_populates="tasks_list")
+  list: Mapped["TaskList"] = relationship(back_populates="tasks_list")
   

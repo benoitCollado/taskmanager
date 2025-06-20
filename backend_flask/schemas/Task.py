@@ -13,5 +13,5 @@ class TaskCreate(TaskBase):
 class TaskRead(TaskBase):
   id:int
   list_id: int
-  class config :
-    from_attributes = True
+  class Config :
+    from_attributes=True
