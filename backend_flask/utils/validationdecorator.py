@@ -1,8 +1,9 @@
 from functools import wraps
 from flask import request, jsonify, wrappers
 from pydantic import BaseModel, ValidationError
+from typing import Type
 
-def validate_model(model_class : BaseModel):
+def validate_model(model_class : Type[BaseModel]):
   def decorator(f):
     @wraps(f)
     def wrapper(*args,**kwargs):

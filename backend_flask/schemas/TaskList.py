@@ -11,6 +11,6 @@ class TaskListCreate(TaskListBase):
 
 class TaskListRead(TaskListBase):
   id:int
-  tasks_list: List[TaskRead]
+  tasks_list: Optional[List[TaskRead]] = []
   class Config:
     from_attributes=True

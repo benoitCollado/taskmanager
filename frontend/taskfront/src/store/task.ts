@@ -2,12 +2,13 @@ import {defineStore} from 'pinia'
 import axios from 'axios'
 import {ref} from 'vue'
 
-export interface Task{
+interface Task{
   id: number
   name: string
   status: string
   list_id: number
 }
+export {Task}
 
 export const useTaskStore = defineStore('task',()=>{
   const tasks = ref<Task[]>([]);
