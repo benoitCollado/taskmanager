@@ -13,5 +13,7 @@ class TaskCreate(TaskBase):
 class TaskRead(TaskBase):
   id:int
   list_id: int
-  class Config :
-    from_attributes=True
+  model_config={
+    "from_attributes":True
+  }
+    

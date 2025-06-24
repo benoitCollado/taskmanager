@@ -18,7 +18,8 @@ def create_app(config_class):
     with app.app_context():
         Base.metadata.create_all(bind=engine)
 
-    from .routes import register_tasklist_routes
+    from .routes import register_tasklist_routes, register_task_routes
     register_tasklist_routes(app, app.config["SESSION_FACTORY"], "/api/")
+    register_task_routes(app, app.config["SESSION_FACTORY"], "/api/")
 
     return app

@@ -12,5 +12,6 @@ class TaskListCreate(TaskListBase):
 class TaskListRead(TaskListBase):
   id:int
   tasks_list: Optional[List[TaskRead]] = []
-  class Config:
-    from_attributes=True
+  model_config={
+   "from_attributes":True
+    }
