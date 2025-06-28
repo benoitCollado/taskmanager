@@ -1,0 +1,1 @@
+export const TASK_STATUS = ["pending", "in_progress", "done"] as const;

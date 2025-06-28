@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import Home from "../pages/Home.vue";
 import TaskLists from "../pages/TaskLists.vue"
 
 
