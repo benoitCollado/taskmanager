@@ -7,7 +7,15 @@ import type {TaskListRead} from "../schemas/TaskList.schema";
 
 export const useTaskListStore = defineStore('tasklist', ()=>{
   const taskLists = ref<TaskListRead[]>([])
+  let lastFetched = 0;
   const fetchTaskList = async ()=>{
+    const now = Date.now();
+    const threeMinutes = 3 * 60 * 1000;
+
+    if(now - lastFetched < threeMinutes){
+      return;
+    }
+
     try{
       const res = await axios.get<TaskListRead[]>("http://localhost:8000/api/tasklist/")
       const data : TaskListRead[] = []
@@ -15,6 +23,7 @@ export const useTaskListStore = defineStore('tasklist', ()=>{
         data.push(TaskListReadSchema.parse(object))
       });
       taskLists.value = data
+      lastFetched = now;
       //console.log(data)
     }catch(err){
       console.error("erreur dans la récupération des données de listes de tâches", err);

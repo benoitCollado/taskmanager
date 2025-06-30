@@ -28,6 +28,20 @@
 </script>
 
 <template>
+  <div>
+    <h1>Liste : {{ list?.name ?? 'chargement...' }}</h1>
+    <v-list-item
+      v-for="task in tasks"
+      :key="task.id">
+        <v-list-item-content>
+          <v-list-item-title>
+            {{ task.name }}
+          </v-list-item-title>
+          {{ task.status }}
+        </v-list-item-content>
+    </v-list-item>
+  </div>
+
   <div class="p-4">
     <h1>Liste : {{ list?.name ?? 'chargement...' }}</h1>
     <div v-for="task in tasks" :key="task.id">

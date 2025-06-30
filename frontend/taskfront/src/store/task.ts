@@ -6,7 +6,17 @@ import type {TaskRead} from "../schemas/Task.schema"
 
 export const useTaskStore = defineStore('task',()=>{
   const tasks = ref<TaskRead[]>([]);
+  let lastFetched : number = 0
   const fetchTasks = async ()=>{
+
+    const now = Date.now();
+    const threeMinutes = 3 * 60 * 1000;
+
+    if(now - lastFetched < threeMinutes){
+      return;
+    }
+
+
     try{
       const res = await axios.get<TaskRead[]>("http://localhost:8000/api/task/");
       const data: TaskRead[] = []
@@ -14,6 +24,7 @@ export const useTaskStore = defineStore('task',()=>{
         data.push(TaskReadSchema.parse(object))
       });
       tasks.value = data;
+      lastFetched = now;
     } catch {
         console.error("problème dans le fetch")
     }  
