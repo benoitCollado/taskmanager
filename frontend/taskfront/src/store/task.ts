@@ -8,9 +8,9 @@ export const useTaskStore = defineStore('task',()=>{
   const tasks = ref<TaskRead[]>([]);
   const fetchTasks = async ()=>{
     try{
-      const res = await axios.get<TaskRead[]>("https://08ca1522-3fb3-455c-9248-e538a904d79d-00-ijrqs1e7cp1.spock.replit.dev:3000/api/task/");
+      const res = await axios.get<TaskRead[]>("http://localhost:8000/api/task/");
       const data: TaskRead[] = []
-      res.data.foreach((object)=>{
+      res.data.forEach((object)=>{
         data.push(TaskReadSchema.parse(object))
       });
       tasks.value = data;

@@ -13,7 +13,7 @@
   <div class="p-4">
     <h1>Listes de tâches </h1>
     <div v-for="list in store.taskLists" :key="list.id">
-      {{list.name}}
+      <router-link :to="{name: 'TaskListDetail', params:{id:list.id}}">{{list.name}}</router-link> 
     </div>
   </div>
 </template>
