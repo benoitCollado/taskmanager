@@ -3,6 +3,7 @@ import axios from 'axios'
 import {ref} from 'vue'
 import {TaskReadSchema} from "../schemas/Task.schema"
 import type {TaskRead} from "../schemas/Task.schema"
+import {z} from "zod"
 
 export const useTaskStore = defineStore('task',()=>{
   const tasks = ref<TaskRead[]>([]);
@@ -30,9 +31,15 @@ export const useTaskStore = defineStore('task',()=>{
     }  
   }
 
-  return {tasks, fetchTasks};
+  const save = (task: z.infer<typeof TaskReadSchema>)=>{
+    console.log("saved", task)
+  }
+
+  return {tasks, fetchTasks, save};
   
-}/*{
+}
+
+/*{
   state: () => ({
     tasks: [] as Task,
   }),
