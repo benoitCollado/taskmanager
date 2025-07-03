@@ -5,7 +5,7 @@
   const store = useTaskListStore()
 
   onMounted(()=>{
-    store.fetchTaskList()
+    store.fetch()
   })
 </script>
 

@@ -1,28 +1,20 @@
 <script setup lang="ts">
 import {ref, reactive, defineProps} from 'vue';
-import {ZodObject, type ZodRawShape, type infer as InferZod, Schema} from 'zod';
+import {ZodObject, type ZodRawShape, type infer as InferZod, Schema, z} from 'zod';
+import {getMeta} from "../schemas/ZodFieldMetaData"
 
-interface Props<T extends ZodRawShape>{
-    schema: ZodObject<T>
-        store:{
-            save:(data:InferZod<ZodObject<T>>) => Promise<void>
-            fetch:()=>Promise<void>
-        }
-    initialData?: Partial<InferZod<ZodObject<T>>>
-}
+type GenericSave<T extends ZodObject<any>> = (data: z.infer<T>) => Promise<boolean | undefined>
 
 const props = defineProps<{
-    schema: ZodObject<ZodRawShape>
+    schema: ZodObject<ZodRawShape>,
     store:{
-        save:(data:InferZod<ZodObject<ZodRawShape>>) => Promise<void>
-        fetch:()=>Promise<void>
+        save: (data:ZodRawShape) => Promise<boolean|undefined>
+        fetch:(forced:boolean)=>Promise<void>
     }
     initialData?: Record<string, any>
 }>();
-console.log("props schema" , props.schema);
-console.log("props store" , props.store);
-console.log("props initialData" , props.initialData);
 
+const emit = defineEmits(['saved']);
 
 const isActive = ref(false);
 const errors = reactive<Record<string, string | null >>({});
@@ -31,11 +23,13 @@ const formData = reactive<Record<string,any>>({});
 function initFormData(){
     const shape = props.schema.shape;
     for(const key in shape){
-        formData[key] = props.initialData?.[key] ?? getDefaultValue(shape[key]._def.typeName);
+        const meta = getMeta(shape[key]);
+        formData[key] = props.initialData?.[key] ?? getDefaultValue(shape[key]._def.typeName, meta);
     }
 }
 
-function getDefaultValue(typeName: string){
+function getDefaultValue(typeName: string, meta?: Record<string, any>){
+    if(meta?.default !== undefined) return meta.default;
     switch(typeName){
         case 'ZodString': return '';
         case 'ZodNumber': return 0;
@@ -57,14 +51,21 @@ async function submit(){
     try{
         errorsClear();
         const parsed = props.schema.parse(formData);
-        await props.store.save(parsed);
-        await props.store.fetch();
-        isActive.value = false;
+        const result = await props.store.save(parsed);
+        if (result){
+            emit('saved');
+            isActive.value = false;
+        }else{
+            errors['erreur post'] = "impossible d'enregitrer la tâche veuillez recommencr plus tard"
+        }
+
     }catch (err : any){
         if(err.errors){
             err.errors.forEach((e:any)=>{
                 errors[e.path[0]] = e.message;
             })
+        }else{
+            console.log("une erreur est survenue : "  ,err);
         }
     }
 }
@@ -78,15 +79,16 @@ function errorsClear(){
 <template>
     <button @click="openForm">Ajouter une Tâche</button>
     <form v-if="isActive" @submit.prevent="submit" style="margin-top:1rem; border:1px solid #CCC; padding:1rem; border-radius:6px;">
-        <div v-for="(schemaField, key) in props.schema.shape" :key="key" style="margin-bottom:1rem;">
-            <label :for="key.toString()" style="font-weight: bold; display:block; margin-bottom:0.3em;">{{ key }}</label>
+        <div v-for="(schemaField, key) in props.schema.shape" :key="key" style="margin-bottom:1rem;" :style="getMeta(schemaField)?.hiden ? 'display: none;':''">
+            <label :for="key.toString()" style="font-weight: bold; display:block; margin-bottom:0.3em;">{{ getMeta(schemaField)?.label ?? key }}</label>
 
             <input
-                v-if="schemaField._def.typeName === 'ZodString'"
-                type="text"
+                v-if="getMeta(schemaField)?.widget  === 'input'"
+                :type="getMeta(schemaField)?.inputType ?? 'text'"
                 :id="key.toString()"
                 v-model="formData[key]"
-                :placeholder="key.toString()"
+                :placeholder="getMeta(schemaField)?.placeholder ?? key.toString()"
+                :disabled="key in (props.initialData || {})"
                 style="width:90%; padding:0.5rem; border-radius:4px; border:1px solid #aaa;"
             />
 
@@ -95,6 +97,7 @@ function errorsClear(){
                 type="number"
                 :id="key.toString()"
                 v-model="formData[key]"
+                :disabled="key in (props.initialData || {})"
                 style="width:90%; padding:0.5rem; border-radius:4px; border:1px solid #aaa;"
             />
 
@@ -102,6 +105,7 @@ function errorsClear(){
                 v-else-if="schemaField._def.typeName === 'ZodBoolean'"
                 type="checkbox"
                 :id="key.toString()"
+                :disabled="key in (props.initialData || {})"
                 v-model="formData[key]"
 
             />
@@ -109,6 +113,7 @@ function errorsClear(){
                 v-else-if="schemaField._def.typeName === 'ZodEnum'"
                 :id="key.toString()"
                 v-model="formData[key]"
+                :disabled="key in (props.initialData || {})"
                 style="width:90%; padding:0.5rem; border-radius: 4px; border:1px solid #aaa;"
             >
                 <option     

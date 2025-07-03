@@ -8,11 +8,11 @@ import type {TaskListRead} from "../schemas/TaskList.schema";
 export const useTaskListStore = defineStore('tasklist', ()=>{
   const taskLists = ref<TaskListRead[]>([])
   let lastFetched = 0;
-  const fetchTaskList = async ()=>{
+  const fetch = async (forced:boolean)=>{
     const now = Date.now();
     const threeMinutes = 3 * 60 * 1000;
 
-    if(now - lastFetched < threeMinutes){
+    if(now - lastFetched < threeMinutes && !forced){
       return;
     }
 
@@ -29,5 +29,5 @@ export const useTaskListStore = defineStore('tasklist', ()=>{
       console.error("erreur dans la récupération des données de listes de tâches", err);
     }
   }
-  return{taskLists, fetchTaskList}
+  return{taskLists, fetch}
 })
