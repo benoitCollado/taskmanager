@@ -1,14 +1,12 @@
 <template>
- <v-app>
-  <v-app-bar app>
-    <v-toolbar-title>Gestionaire des tâches</v-toolbar-title>
-    <v-spacer />
-    <v-btn text :to="{name:'TaskLists'}">Acceuil</v-btn>
-  </v-app-bar>
-  <v-main class="pa-4">
+ <nav>
+  <button><router-link :to="{name:'TaskLists'}">Acceuil</router-link></button>
+ </nav>
+  <main>
     <router-view/>
-  </v-main>
- </v-app>
+  </main>
+    
+
 </template>
 
 <script setup lang="ts">

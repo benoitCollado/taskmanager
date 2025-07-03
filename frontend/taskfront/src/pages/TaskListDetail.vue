@@ -1,36 +1,27 @@
 <script setup lang="ts">
   import {useTaskListStore} from "../store/taskLists";
   import {useTaskStore} from "../store/task"
-  import {onMounted,ref} from 'vue';
+  import {onMounted,ref,watch, computed} from 'vue';
   import {useRoute} from 'vue-router';
   import type  {TaskListRead} from '../schemas/TaskList.schema';
   import type {TaskRead} from '../schemas/Task.schema';
-  import TaskForm from '../components/TaskForm.vue';
   import ZodForm from '../components/ZodForm.vue'
-  import {TaskReadSchema} from '../schemas/Task.schema'
+  import {TaskCreateSchema} from '../schemas/Task.schema'
 
   const taskStore = useTaskStore();
   const taskListStore = useTaskListStore();
   const route = useRoute();
   const id = route.params.id;
-  const list = ref<TaskListRead>();
-  const tasks = ref<TaskRead>();
-  const newTask = ref('');
-
-  function addTask(){
-    console.log(newTask.value);
-  }
+  const list = computed (()=>{
+    return taskListStore.taskLists.find(list => list.id === Number(id));
+  })
+  const tasks = computed(()=>{
+    return taskStore.tasks.filter(task => task.list_id === Number(id));
+  })
 
   onMounted(async () => {
-  await taskStore.fetchTasks();
-  await taskListStore.fetchTaskList();
-  console.log(taskStore.tasks);
-  console.log(taskListStore.taskLists);
-  const idNumber = Number(id);
-  list.value = taskListStore.taskLists.find(list => list.id === idNumber);
-  tasks.value = taskStore.tasks.filter(task => task.list_id === idNumber);
-  console.log(tasks);
-  //taskListStore.fetchTaskLists()
+    await taskStore.fetch(true);
+    await taskListStore.fetch(true);
   });
 </script>
 
@@ -46,6 +37,6 @@
         </h2>
         <p style="margin:0.1rem;">{{ task.status }}</p>
     </div>
-    <ZodForm :schema="TaskReadSchema" :store="taskStore" />
+    <ZodForm :schema="TaskCreateSchema" :store="{save:taskStore.save, fetch:taskStore.fetch}" :initial-data="{list_id : Number(id), status:'pending'}" @saved="taskStore.fetch(true)" />
   </div>
 </template>
