@@ -1,4 +1,4 @@
-import {z, type ZodTypeAny} from "zod";
+import {type ZodTypeAny} from "zod";
 
 export function withMeta<T extends ZodTypeAny>(schema : T, meta: Record<string,any>): T {
     (schema as any )._def.meta = meta;

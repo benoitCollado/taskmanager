@@ -1,10 +1,8 @@
 <script setup lang="ts">
   import {useTaskListStore} from "../store/taskLists";
   import {useTaskStore} from "../store/task"
-  import {onMounted,ref,watch, computed} from 'vue';
+  import {onMounted, computed} from 'vue';
   import {useRoute} from 'vue-router';
-  import type  {TaskListRead} from '../schemas/TaskList.schema';
-  import type {TaskRead} from '../schemas/Task.schema';
   import ZodForm from '../components/ZodForm.vue'
   import {TaskCreateSchema} from '../schemas/Task.schema'
 

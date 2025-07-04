@@ -1,9 +1,9 @@
 import {defineStore} from 'pinia'
 import axios from 'axios'
-import {ref, reactive} from 'vue'
-import {TaskReadSchema, TaskCreateSchema, type TaskCreate} from "../schemas/Task.schema"
+import { reactive} from 'vue'
+import {TaskReadSchema,type TaskCreate} from "../schemas/Task.schema"
 import type {TaskRead} from "../schemas/Task.schema"
-import {z, type ZodRawShape} from "zod"
+import {type ZodRawShape} from "zod"
 
 export const useTaskStore = defineStore('task',()=>{
   const tasks = reactive<TaskRead[]>([]);
@@ -44,15 +44,4 @@ export const useTaskStore = defineStore('task',()=>{
 
   return {tasks, fetch, save};
   
-}/*{
-  state: () => ({
-    tasks: [] as Task,
-  }),
-  actions:{
-    async fetchTasks(){
-      const res = await axios.get<Task[]>("https://08ca1522-3fb3-455c-9248-e538a904d79d-00-ijrqs1e7cp1.spock.replit.dev:3000/tasks/");
-      this.tasks = res.data;
-      console.log(res.data);
-    }
-  }
-}*/)
+})

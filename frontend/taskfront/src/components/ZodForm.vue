@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import {ref, reactive, defineProps} from 'vue';
-import {ZodObject, type ZodRawShape, type infer as InferZod, Schema, z} from 'zod';
+import {ZodObject, type ZodRawShape} from 'zod';
 import {getMeta} from "../schemas/ZodFieldMetaData"
 
-type GenericSave<T extends ZodObject<any>> = (data: z.infer<T>) => Promise<boolean | undefined>
 
 const props = defineProps<{
     schema: ZodObject<ZodRawShape>,

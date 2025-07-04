@@ -1,8 +1,6 @@
 import {z} from "zod";
 import {TASK_STATUS} from "../constants/constants"
 import * as metaZod from "./ZodFieldMetaData"
-import { readonly } from "zod/v4";
-import { fa } from "vuetify/locale";
 
 export const TaskReadSchema = z.object({
   name: metaZod.withMeta(z.string(),{
