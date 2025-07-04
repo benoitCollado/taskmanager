@@ -3,7 +3,6 @@ import axios from 'axios'
 import {ref, reactive} from 'vue'
 import {TaskReadSchema, TaskCreateSchema, type TaskCreate} from "../schemas/Task.schema"
 import type {TaskRead} from "../schemas/Task.schema"
-=======
 import {z, type ZodRawShape} from "zod"
 
 export const useTaskStore = defineStore('task',()=>{
@@ -18,23 +17,18 @@ export const useTaskStore = defineStore('task',()=>{
       return;
     }
 
-
->>>>>>> feature/vuetify
     try{
       const res = await axios.get<TaskRead[]>("http://localhost:8000/api/task/");
       const data: TaskRead[] = []
       res.data.forEach((object)=>{
         data.push(TaskReadSchema.parse(object))
       });
-=======
       tasks.splice(0, tasks.length, ...data);
       lastFetched = now;
->>>>>>> feature/vuetify
     } catch {
         console.error("problème dans le fetch")
     }  
   }
-=======
   const save = async (task:ZodRawShape): Promise<boolean | undefined>=>{
     try{
       const res = await axios.post<TaskCreate>("http://localhost:8000/api/task/", task);
@@ -49,7 +43,6 @@ export const useTaskStore = defineStore('task',()=>{
   }
 
   return {tasks, fetch, save};
->>>>>>> feature/vuetify
   
 }/*{
   state: () => ({

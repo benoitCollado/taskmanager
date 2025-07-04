@@ -7,7 +7,6 @@ import type {TaskListRead} from "../schemas/TaskList.schema";
 
 export const useTaskListStore = defineStore('tasklist', ()=>{
   const taskLists = ref<TaskListRead[]>([])
-=======
   let lastFetched = 0;
   const fetch = async (forced:boolean)=>{
     const now = Date.now();
@@ -16,8 +15,6 @@ export const useTaskListStore = defineStore('tasklist', ()=>{
     if(now - lastFetched < threeMinutes && !forced){
       return;
     }
-
->>>>>>> feature/vuetify
     try{
       const res = await axios.get<TaskListRead[]>("http://localhost:8000/api/tasklist/")
       const data : TaskListRead[] = []
