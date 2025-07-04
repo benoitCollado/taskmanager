@@ -1,10 +1,14 @@
 <template>
-  <header>
-  <nav>
-    <router-link :to="{name:'TaskLists'}">Liste Des tâches</router-link>
-  </nav>
-</header>
-  <router-view />
+=======
+ <nav>
+  <button><router-link :to="{name:'TaskLists'}">Acceuil</router-link></button>
+ </nav>
+  <main>
+    <router-view/>
+  </main>
+    
+
+>>>>>>> feature/vuetify
 </template>
 
 <script setup lang="ts">
