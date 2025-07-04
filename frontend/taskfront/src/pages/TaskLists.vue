@@ -5,6 +5,7 @@
   const store = useTaskListStore()
 
   onMounted(()=>{
+
     store.fetch(false);
   })
 </script>
