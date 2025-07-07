@@ -42,6 +42,19 @@ export const useTaskStore = defineStore('task',()=>{
     }
   }
 
-  return {tasks, fetch, save};
+  const erase = async(id:number): Promise<boolean | undefined> => {
+    try{
+      const res = await axios.delete(`http://localhost:8000/api/task/${id}`);
+      if(res.status === 204){
+        return true;
+      }else{
+        return false;
+      }
+    }catch{
+      console.log("une erreur est survenue dans la suppression de la donnée");
+    }
+  }
+
+  return {tasks, fetch, save, erase};
   
 })

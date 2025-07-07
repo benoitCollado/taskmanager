@@ -8,14 +8,12 @@ const props = defineProps<{
     schema: ZodObject<ZodRawShape>,
     store:{
         save: (data:ZodRawShape) => Promise<boolean|undefined>
-        fetch:(forced:boolean)=>Promise<void>
     }
     initialData?: Record<string, any>
 }>();
 
-const emit = defineEmits(['saved']);
+const emit = defineEmits(['saved','canceled']);
 
-const isActive = ref(false);
 const errors = reactive<Record<string, string | null >>({});
 const formData = reactive<Record<string,any>>({});
 
@@ -39,12 +37,10 @@ function getDefaultValue(typeName: string, meta?: Record<string, any>){
 }
 
 initFormData();
+Object.keys(errors).forEach(k=> errors[k] = null);
 
-function openForm(){
-    isActive.value = true;
-    initFormData();
-    Object.keys(errors).forEach(k=> errors[k] = null);
-}
+    
+
 
 async function submit(){
     try{
@@ -53,7 +49,6 @@ async function submit(){
         const result = await props.store.save(parsed);
         if (result){
             emit('saved');
-            isActive.value = false;
         }else{
             errors['erreur post'] = "impossible d'enregitrer la tâche veuillez recommencr plus tard"
         }
@@ -76,8 +71,7 @@ function errorsClear(){
 </script>
 
 <template>
-    <button @click="openForm">Ajouter une Tâche</button>
-    <form v-if="isActive" @submit.prevent="submit" style="margin-top:1rem; border:1px solid #CCC; padding:1rem; border-radius:6px;">
+    <form  @submit.prevent="submit" style="margin-top:1rem; border:1px solid #CCC; padding:1rem; border-radius:6px;">
         <div v-for="(schemaField, key) in props.schema.shape" :key="key" style="margin-bottom:1rem;" :style="getMeta(schemaField)?.hiden ? 'display: none;':''">
             <label :for="key.toString()" style="font-weight: bold; display:block; margin-bottom:0.3em;">{{ getMeta(schemaField)?.label ?? key }}</label>
 
@@ -87,7 +81,6 @@ function errorsClear(){
                 :id="key.toString()"
                 v-model="formData[key]"
                 :placeholder="getMeta(schemaField)?.placeholder ?? key.toString()"
-                :disabled="key in (props.initialData || {})"
                 style="width:90%; padding:0.5rem; border-radius:4px; border:1px solid #aaa;"
             />
 
@@ -96,7 +89,6 @@ function errorsClear(){
                 type="number"
                 :id="key.toString()"
                 v-model="formData[key]"
-                :disabled="key in (props.initialData || {})"
                 style="width:90%; padding:0.5rem; border-radius:4px; border:1px solid #aaa;"
             />
 
@@ -104,7 +96,6 @@ function errorsClear(){
                 v-else-if="schemaField._def.typeName === 'ZodBoolean'"
                 type="checkbox"
                 :id="key.toString()"
-                :disabled="key in (props.initialData || {})"
                 v-model="formData[key]"
 
             />
@@ -112,7 +103,6 @@ function errorsClear(){
                 v-else-if="schemaField._def.typeName === 'ZodEnum'"
                 :id="key.toString()"
                 v-model="formData[key]"
-                :disabled="key in (props.initialData || {})"
                 style="width:90%; padding:0.5rem; border-radius: 4px; border:1px solid #aaa;"
             >
                 <option     
@@ -128,6 +118,6 @@ function errorsClear(){
         </div>
 
         <button type="submit" style="margin-right: 0.5rem;">Enregistrer</button>
-        <button type="button" @click="isActive = false">Annuler</button>
+        <button type="button" @click="emit('canceled')">Annuler</button>
     </form>
 </template>

@@ -6,7 +6,7 @@ from ..schemas.Task import TaskRead, TaskCreate
 from ..schemas.TaskList import TaskListRead, TaskListCreate
 from ..utils.validationdecorator import validate_model
 from typing import Type
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 
 
@@ -64,7 +64,20 @@ def register_task_routes(app, SessionLocal, prefix:str):
       print(f"500-Une erreur est intervenue : {e}")
       return jsonify({"error":"an error occured"}),500
     
-  
+  @task_bp.route("/task/<int:task_id>", methods=["DELETE"])
+  def delete_task(task_id):
+    try:
+      db = SessionLocal()
+      sql = delete(Task).where(Task.id == task_id)
+      db.execute(sql)
+      db.commit()
+      db.close()
+      return jsonify({"message":f"la tache {task_id} est bie supprimée"}),204
+    except Exception as e:
+      print("erreur dans le suppression de la tâche")
+      return jsonify({"error":"an error occured"}),500
+
+    
       
 
   app.register_blueprint(task_bp, url_prefix = prefix)
