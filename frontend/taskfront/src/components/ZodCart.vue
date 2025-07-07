@@ -17,7 +17,6 @@ const props = defineProps<{
 const emit = defineEmits(['saved']);
 
 const isEdit = ref(false);
-const errors = reactive<Record<string, string|null>>({});
 const formData = reactive<Record<string,any>>({})
 
 function initFormData(){
@@ -28,31 +27,6 @@ function initFormData(){
 }
 
 initFormData();
-
-function toEdit(){
-    isEdit.value = true;
-}
-
-async function submit(){
-    try{
-        errorsClear();
-        const parsed = props.schemaMod.parse(formData);
-        const result = await props.store.save(parsed);
-        if(result){
-            emit('saved');
-            isEdit.value =false;
-        }else{
-            errors['erreur modif'] = "impossible d'enregister la tâche beuillez recomencer plsu tard";
-        }
-    }catch (err){
-        console.log("une erreur est survenue : ", err);
-    }
-}
-
-function errorsClear(){
-    Object.keys(errors).forEach(k=>errors[k] = null);
-}
-
 
 </script>
 

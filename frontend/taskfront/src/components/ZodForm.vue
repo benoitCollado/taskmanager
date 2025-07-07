@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, reactive, defineProps} from 'vue';
+import {reactive, defineProps} from 'vue';
 import {ZodObject, type ZodRawShape} from 'zod';
 import {getMeta} from "../schemas/ZodFieldMetaData"
 

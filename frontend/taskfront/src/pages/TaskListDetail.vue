@@ -6,7 +6,6 @@
   import ZodForm from '../components/ZodForm.vue'
   import {TaskCreateSchema, TaskReadSchema} from '../schemas/Task.schema'
 import ZodCart from "../components/ZodCart.vue";
-import { CanceledError } from "axios";
 
    interface Alerte {
     type:"info"|"warning"|"error"
