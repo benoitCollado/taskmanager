@@ -13,7 +13,7 @@ import ZodCart from "../components/ZodCart.vue";
     message:string
   }
 
-  const taskStore = useTaskStore();
+  const {tasks, save, erase, modify, fetch} = useTaskStore();
   const taskListStore = useTaskListStore();
   const route = useRoute();
   const id = route.params.id;
@@ -25,14 +25,14 @@ import ZodCart from "../components/ZodCart.vue";
   const list = computed (()=>{
     return taskListStore.taskLists.find(list => list.id === Number(id));
   })
-  const tasks = computed(()=>{
-    return taskStore.tasks.filter(task => task.list_id === Number(id));
+  const tasksValue = computed(()=>{
+    return tasks.filter(task => task.list_id === Number(id));
   })
 
   const eraseTask = async (id:number)=>{
-    const success = await taskStore.erase(id);
+    const success = await erase(id);
     if(success){
-      taskStore.fetch(true)
+      fetch(true)
     }else{
       const alert : Alerte = {type:"error", title:"Suppression Error", message:"The task Suppression doesn't work retry later or contact support"}
       alerts.push(alert)
@@ -46,12 +46,16 @@ import ZodCart from "../components/ZodCart.vue";
   }
 
   onMounted(async () => {
-    await taskStore.fetch(true);
+    await fetch(true);
     await taskListStore.fetch(true);
   });
 
   function openCloseForm(){
     isAdding.value = !isAdding.value;
+  }
+  async function handleSavedModifications(task_id:number, payload:any){
+    await modify(task_id, payload);
+    await fetch(true);
   }
 </script>
 
@@ -63,16 +67,16 @@ import ZodCart from "../components/ZodCart.vue";
     </div>
 
     <h1>Liste : {{ list?.name ?? 'chargement...' }}</h1>
-    <div v-for="task in tasks" class="task-cart" :key="task.id">
-      <ZodCart :data="task" :schema-mod="TaskCreateSchema" :schema-read="TaskReadSchema" :store="{save:taskStore.save}" @saved="taskStore.fetch(true)"/>
-      <!--<h4>{{task.name}}</h4> 
-      <span :class="task.status"> {{  task.status  }} </span>
-      <span @click="eraseTask(task.id)" class="close-button">X</span>-->
-      <span @click="eraseTask(task.id)" class="close-button">X</span>
+    <div v-for="task in tasksValue" class="task-cart" :key="task.id" draggable="true">
+      <ZodCart :data="task" :schema-mod="TaskCreateSchema" :schema-read="TaskReadSchema"  @saved="async (payload)=>{handleSavedModifications(task.id, payload)}">
+        <span @click="eraseTask(task.id)" class="close-button">X</span>
+      </ZodCart>
     </div>
 
     <button v-if="!isAdding" @click="openCloseForm">Ajouter une Tâche</button>
-    <ZodForm v-if="isAdding" :schema="TaskCreateSchema" :store="{save:taskStore.save}" :initial-data="{list_id : Number(id), status:'pending'}" @saved="()=>{taskStore.fetch(true); openCloseForm();}" @canceled="openCloseForm()" />
+    <div v-if="isAdding" class="task-cart">
+      <ZodForm :schema="TaskCreateSchema"  :initial-data="{list_id : Number(id), status:'pending'}" @saved="async (payload)=>{await save(payload);await fetch(true); openCloseForm();}" @canceled="openCloseForm()" />
+    </div>
   </div>
 </template>
 

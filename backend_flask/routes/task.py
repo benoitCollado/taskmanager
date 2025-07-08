@@ -18,7 +18,7 @@ def register_task_routes(app, SessionLocal, prefix:str):
   def get_tasks():
     try:
       db = SessionLocal()
-      tasks = db.query(Task).filter(Task.status == TaskStatus.pending).all()
+      tasks = db.query(Task).filter().all()
       result = [TaskRead.model_validate(t).model_dump() for t in tasks]
       db.close()
       return jsonify(result),200
@@ -72,11 +72,28 @@ def register_task_routes(app, SessionLocal, prefix:str):
       db.execute(sql)
       db.commit()
       db.close()
-      return jsonify({"message":f"la tache {task_id} est bie supprimée"}),204
+      return jsonify({"message":f"la tache {task_id} est bien supprimée"}),204
     except Exception as e:
       print("erreur dans le suppression de la tâche")
       return jsonify({"error":"an error occured"}),500
-
+    
+  @task_bp.route("/task/<int:task_id>", methods=["PUT", "PATCH"])
+  @validate_model(TaskCreate)
+  def modify_task(validated_data, task_id):
+    try:
+      with SessionLocal() as session:
+        sql = select(Task).where(Task.id == task_id)
+        result = session.execute(sql).scalars().one()
+        for key, value in validated_data.dict().items():
+          setattr(result, key, value)
+        session.commit()
+        return jsonify({"message":f"la tâche {task_id} est bien modifiée"}),201
+    except ValidationError as e:
+      print(f"500-erreur de validation des données : {e}")
+      return jsonify({"error":"data validation error"}),500
+    except Exception as e:
+      print(f"500-Une erreur est intervenue : {e}")
+      return jsonify({"error":"an error occured"}),500
     
       
 

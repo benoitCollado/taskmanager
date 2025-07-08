@@ -6,13 +6,13 @@ import {getMeta} from "../schemas/ZodFieldMetaData"
 
 const props = defineProps<{
     schema: ZodObject<ZodRawShape>,
-    store:{
-        save: (data:ZodRawShape) => Promise<boolean|undefined>
-    }
     initialData?: Record<string, any>
 }>();
 
-const emit = defineEmits(['saved','canceled']);
+const emit = defineEmits<{
+    (e:'saved', payload:any):void
+    (e:'canceled'):void
+}>();
 
 const errors = reactive<Record<string, string | null >>({});
 const formData = reactive<Record<string,any>>({});
@@ -46,9 +46,10 @@ async function submit(){
     try{
         errorsClear();
         const parsed = props.schema.parse(formData);
-        const result = await props.store.save(parsed);
-        if (result){
-            emit('saved');
+        //const result = await props.store.save(parsed);
+        if (parsed){
+            emit('saved', parsed);
+            console.log("là");
         }else{
             errors['erreur post'] = "impossible d'enregitrer la tâche veuillez recommencr plus tard"
         }
@@ -71,7 +72,6 @@ function errorsClear(){
 </script>
 
 <template>
-    <form  @submit.prevent="submit" style="margin-top:1rem; border:1px solid #CCC; padding:1rem; border-radius:6px;">
         <div v-for="(schemaField, key) in props.schema.shape" :key="key" style="margin-bottom:1rem;" :style="getMeta(schemaField)?.hiden ? 'display: none;':''">
             <label :for="key.toString()" style="font-weight: bold; display:block; margin-bottom:0.3em;">{{ getMeta(schemaField)?.label ?? key }}</label>
 
@@ -117,7 +117,6 @@ function errorsClear(){
             <div v-if="errors[key]" style="color: red; font-size:0.85rem; margin-top: 0.2rem;">{{ errors[key] }}</div>
         </div>
 
-        <button type="submit" style="margin-right: 0.5rem;">Enregistrer</button>
+        <button type="button" @click="submit" style="margin-right: 0.5rem;">Enregistrer</button>
         <button type="button" @click="emit('canceled')">Annuler</button>
-    </form>
 </template>

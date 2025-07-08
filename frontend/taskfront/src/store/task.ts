@@ -1,19 +1,19 @@
 import {defineStore} from 'pinia'
 import axios from 'axios'
-import { reactive} from 'vue'
+import {ref} from 'vue'
 import {TaskReadSchema,type TaskCreate} from "../schemas/Task.schema"
 import type {TaskRead} from "../schemas/Task.schema"
 import {type ZodRawShape} from "zod"
 
 export const useTaskStore = defineStore('task',()=>{
-  const tasks = reactive<TaskRead[]>([]);
-  let lastFetched : number = 0
+  const tasks = ref<TaskRead[]>([]);
+  let lastFetched = ref(0);
   const fetch = async (forced:boolean): Promise<void>=>{
 
     const now = Date.now();
     const threeMinutes = 3 * 60 * 1000;
 
-    if(now - lastFetched < threeMinutes && !forced){
+    if(now - lastFetched.value < threeMinutes && !forced){
       return;
     }
 
@@ -23,8 +23,8 @@ export const useTaskStore = defineStore('task',()=>{
       res.data.forEach((object)=>{
         data.push(TaskReadSchema.parse(object))
       });
-      tasks.splice(0, tasks.length, ...data);
-      lastFetched = now;
+      tasks.value.splice(0, tasks.value.length, ...data);
+      lastFetched.value = now;
     } catch {
         console.error("problème dans le fetch")
     }  
@@ -42,7 +42,7 @@ export const useTaskStore = defineStore('task',()=>{
     }
   }
 
-  const erase = async(id:number): Promise<boolean | undefined> => {
+  const erase = async (id:number): Promise<boolean | undefined> => {
     try{
       const res = await axios.delete(`http://localhost:8000/api/task/${id}`);
       if(res.status === 204){
@@ -55,6 +55,19 @@ export const useTaskStore = defineStore('task',()=>{
     }
   }
 
-  return {tasks, fetch, save, erase};
+  const modify = async (id:number, task:ZodRawShape): Promise<boolean|undefined> => {
+    try{
+      const res = await axios.put(`http://localhost:8000/api/task/${id}`, task);
+      if(res.status === 201){
+        return true;
+      }else{
+        return false;
+      }
+    }catch{
+      console.error("problème survenue dans mla modification coté server");
+    }
+  }
+
+  return {tasks, fetch, save, erase, modify};
   
 })

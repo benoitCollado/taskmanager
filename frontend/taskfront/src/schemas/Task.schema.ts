@@ -7,8 +7,9 @@ export const TaskReadSchema = z.object({
     label:"Nom",
     placeholder:"entrer une tâche",
     readonly:true,
-    widget:"h2",
+    widget:"h4",
     hiden:false,
+    link:true
   }),
   id: metaZod.withMeta(z.number(),{
     label:"N° id",

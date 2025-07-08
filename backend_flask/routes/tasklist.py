@@ -7,6 +7,7 @@ from ..schemas.TaskList import TaskListRead, TaskListCreate
 from ..utils.validationdecorator import validate_model
 from sqlalchemy.exc import NoResultFound, MultipleResultsFound
 from pydantic import ValidationError
+from sqlalchemy import select, delete
 
 
 def register_tasklist_routes(app, SessionLocal, prefix:str):
@@ -46,6 +47,7 @@ def register_tasklist_routes(app, SessionLocal, prefix:str):
       db.commit()
       tasklist = TaskListRead.model_validate(tasklist).model_dump()
       db.close()
+      print("on est là")
       return jsonify(tasklist), 201
     except ValidationError as exc :
       print(repr(exc.errors()[0]['type']))
@@ -54,5 +56,37 @@ def register_tasklist_routes(app, SessionLocal, prefix:str):
       e.add_note(f"{validated_data}")
       return jsonify({"error": f"une erreur est intervenue : {e}"}), 403
       
+  @tasklist_bp.route("/tasklist/<int:list_id>", methods=["PUT", "PATCH"])
+  @validate_model(TaskListCreate)
+  def modify_taskList(validated_data, list_id):
+    try:
+      with SessionLocal() as session:
+        sql = select(TaskList).where(TaskList.id == list_id)
+        result = session.execute(sql).scalars().one()
+        for key, value in validated_data.dict().items():
+          setattr(result, key, value)
+        session.commit()
+        return jsonify({"message":f"la liste {list_id} a bien été modifiée"}), 201
+    except ValidationError as exc :
+      print(repr(exc.errors()[0]['type']))
+      return jsonify({"error":"la validation des données n'est correcte"}), 400
+    except Exception as e :
+      e.add_note(f"{validated_data}")
+      return jsonify({"error": f"une erreur est intervenue : {e}"}), 403  
+    
+  @tasklist_bp.route("/tasklist/<int:list_id>", methods=["DELETE"])
+  def delete_taskList(list_id):
+    try:
+      with SessionLocal() as session:
+        sql = delete(TaskList).where(TaskList.id == list_id)
+        session.execute(sql)
+        session.commit()
+        return jsonify({"message":f"la liste {list_id} a bien été supprimée"}), 204
+    except ValidationError as exc :
+      print(repr(exc.errors()[0]['type']))
+      return jsonify({"error":"la validation des données n'est correcte"}), 400
+    except Exception as e :
+      print("une erreur est survenue", e)
+      return jsonify({"error": f"une erreur est intervenue : {e}"}), 403  
 
   app.register_blueprint(tasklist_bp, url_prefix=prefix)
